@@ -107,14 +107,35 @@ export default function TabFreqSweep({ calc }: Props) {
             const maxQIdx = qs.indexOf(Math.max(...qs));
             const minVcapIdx = vcaps.indexOf(Math.min(...vcaps.filter(v => v > 0)));
             return [
-              { label: 'Max η', f: freqs[maxEtaIdx]?.toFixed(2), val: etas[maxEtaIdx]?.toFixed(2) + ' %', color: '#3fb950' },
-              { label: 'Max Q', f: freqs[maxQIdx]?.toFixed(2), val: Math.round(qs[maxQIdx]).toString(), color: '#58a6ff' },
-              { label: 'Min V_cap', f: freqs[minVcapIdx]?.toFixed(2), val: vcaps[minVcapIdx]?.toFixed(2) + ' kV', color: '#d2a8ff' },
+              {
+                label: 'Max η — Beste efficiëntie',
+                f: freqs[maxEtaIdx]?.toFixed(2),
+                val: etas[maxEtaIdx]?.toFixed(2) + ' %',
+                color: '#3fb950',
+                explain: 'Op hogere frequenties stijgt R_rad ∝ f⁴ terwijl R_loop slechts ∝ √f groeit. Dit punt geeft de beste verhouding tussen stralingsrendement en conductorverliezen. Gebruik deze frequentie als je DX-prestaties wilt maximaliseren.',
+              },
+              {
+                label: 'Max Q — Scherpste afstemming',
+                f: freqs[maxQIdx]?.toFixed(2),
+                val: 'Q = ' + Math.round(qs[maxQIdx]).toString(),
+                color: '#58a6ff',
+                explain: 'Q bepaalt de bandbreedte (BW = f/Q) en de selectiviteit. Hoge Q = smal signaalvenster → uitstekende ruis-onderdrukking maar kritische afstemming. Bij RX is dit voordelig; bij TX vereist het een stabiele condensator.',
+              },
+              {
+                label: 'Min V_cap — Veiligste condensator',
+                f: freqs[minVcapIdx]?.toFixed(2),
+                val: vcaps[minVcapIdx]?.toFixed(2) + ' kV RMS',
+                color: '#d2a8ff',
+                explain: 'De condensatorspanning V_cap = I·X_C neemt sterk af op hogere frequenties (X_C daalt). Op dit punt is de belasting van de condensator het laagst — interessant als je een condensator met lage spanningsrating wil gebruiken of hoog vermogen wil zenden.',
+              },
             ].map(item => (
-              <div key={item.label} className="stat-card">
-                <span className="stat-label">{item.label}</span>
-                <span className="stat-val" style={{ fontSize: 16, color: item.color }}>{item.f} MHz</span>
+              <div key={item.label} className="stat-card" style={{ position: 'relative', cursor: 'default' }}>
+                <span className="stat-label" style={{ fontSize: 9 }}>{item.label}</span>
+                <span className="stat-val" style={{ fontSize: 18, color: item.color }}>{item.f} MHz</span>
                 <span style={{ fontSize: 10, color: 'var(--muted)', fontFamily: MONO }}>{item.val}</span>
+                <div style={{ marginTop: 6, fontSize: 10, color: 'var(--muted)', lineHeight: 1.5, borderTop: '1px solid var(--border)', paddingTop: 6 }}>
+                  {item.explain}
+                </div>
               </div>
             ));
           })()}

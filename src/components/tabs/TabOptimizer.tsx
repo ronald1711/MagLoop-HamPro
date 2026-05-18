@@ -65,17 +65,36 @@ export default function TabOptimizer({ calc }: Props) {
         Sweep van 0.2 tot 3.0m diameter bij huidige frequentie ({inputs.fMHz.toFixed(3)} MHz) en geleider. Rode stip = huidig, ster = optimum.
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 8, marginBottom: 16 }}>
         {[
-          { label: 'Max η', d: diams[maxEtaIdx], val: etas[maxEtaIdx]?.toFixed(2) + ' %', color: '#3fb950' },
-          { label: 'Max Q', d: diams[maxQIdx], val: Math.round(qs[maxQIdx]).toString(), color: '#58a6ff' },
-          { label: 'Min V_cap', d: diams[minVcapIdx], val: vcaps[minVcapIdx]?.toFixed(2) + ' kV', color: '#d2a8ff' },
-          { label: 'Max BW', d: diams[maxBwIdx], val: bws[maxBwIdx]?.toFixed(2) + ' kHz', color: '#ffa657' },
+          {
+            label: 'Max η — Hoogste efficiëntie',
+            d: diams[maxEtaIdx], val: etas[maxEtaIdx]?.toFixed(2) + ' %', color: '#3fb950',
+            explain: 'De grootst mogelijke lus levert hier de beste efficiëntie: R_rad groeit met D⁴ terwijl R_loop slechts ∝ D toeneemt. Kies dit als zendprestaties prioriteit hebben. Let op: V_cap stijgt ook — controleer condensatorrating!',
+          },
+          {
+            label: 'Max Q — Scherpste selectiviteit',
+            d: diams[maxQIdx], val: 'Q = ' + Math.round(qs[maxQIdx]).toString(), color: '#58a6ff',
+            explain: 'Hoge Q = smalle bandbreedte = beste ruisonderdrukking voor ontvangst. BW = f/Q. Kleine diameter geeft hogere Q maar ten koste van efficiëntie. Ideaal voor RX-gebruik of contestantennes waarbij signaalscheiding belangrijk is.',
+          },
+          {
+            label: 'Min V_cap — Laagste condensatorbelasting',
+            d: diams[minVcapIdx], val: vcaps[minVcapIdx]?.toFixed(2) + ' kV RMS', color: '#d2a8ff',
+            explain: 'Smaller diameter → lagere inductantie L → lagere X_L → lagere reactieve spanning V_cap = I·X_L. Gebruik dit punt als je condensator een beperkte spanningsrating heeft, of als je hoog vermogen wil zenden zonder dure HV-condensator.',
+          },
+          {
+            label: 'Max BW — Breedste bandbreedte',
+            d: diams[maxBwIdx], val: bws[maxBwIdx]?.toFixed(2) + ' kHz', color: '#ffa657',
+            explain: 'Hogere BW = minder kritische afstemming = makkelijker in gebruik. BW = f/Q, dus lage Q geeft brede BW. Handig voor SSB of als je niet elke kHz wil hercalibreren. Kost wel efficiëntie. Overweeg een motorische condensator bij BW < 3 kHz.',
+          },
         ].map(item => (
-          <div key={item.label} className="stat-card">
-            <span className="stat-label">{item.label}</span>
-            <span className="stat-val" style={{ fontSize: 16, color: item.color }}>{item.d?.toFixed(2)} m</span>
+          <div key={item.label} className="stat-card" style={{ cursor: 'default' }}>
+            <span className="stat-label" style={{ fontSize: 9 }}>{item.label}</span>
+            <span className="stat-val" style={{ fontSize: 20, color: item.color }}>{item.d?.toFixed(2)} m</span>
             <span style={{ fontSize: 10, color: 'var(--muted)', fontFamily: MONO }}>{item.val}</span>
+            <div style={{ marginTop: 6, fontSize: 10, color: 'var(--muted)', lineHeight: 1.5, borderTop: '1px solid var(--border)', paddingTop: 6 }}>
+              {item.explain}
+            </div>
           </div>
         ))}
       </div>

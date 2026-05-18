@@ -15,9 +15,13 @@
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;display:flex;min-height:100vh;overflow:hidden;}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;display:flex;min-height:100vh;overflow-x:auto;overflow-y:auto;}
 
-  .sidebar{width:380px;min-width:380px;background:var(--panel);border-right:1px solid var(--border);padding:20px;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+  .sidebar{width:310px;min-width:280px;background:var(--panel);border-right:1px solid var(--border);padding:16px;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;flex-shrink:0;}
+
+  /* Font size scaling via CSS zoom */
+  [data-fontsize="small"] .sidebar,[data-fontsize="small"] .main { zoom: 0.85; }
+  [data-fontsize="large"]  .sidebar,[data-fontsize="large"]  .main { zoom: 1.18; }
   h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;color:var(--text-bold);text-transform:uppercase;letter-spacing:1px;}
   h1 span{color:var(--c-primary);}
   .version-tag{font-family:'Share Tech Mono';font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:-6px;}
@@ -40,10 +44,10 @@
   .regime-text{flex:1;}
   .regime-clam{color:var(--c-primary);font-size:11px;font-weight:bold;}
 
-  .main{flex:1;padding:25px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+  .main{flex:1;padding:18px 20px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:16px;min-width:0;}
   .section-title{font-family:'Share Tech Mono';font-size:11px;color:var(--c-primary);text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:5px;margin-bottom:10px;}
 
-  .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+  .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
   .stat-card{background:var(--panel);border:1px solid var(--border);padding:12px;border-radius:6px;cursor:help;transition:transform 0.1s;}
   .stat-card:hover{border-color:var(--c-primary);transform:translateY(-2px);}
   .stat-val{display:block;font-size:24px;font-weight:700;color:var(--text-bold);font-family:'Barlow Condensed';}

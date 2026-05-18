@@ -1,7 +1,7 @@
 import type { useCalculator } from "../hooks/useCalculator";
 import { BAND_PRESETS, CONDUCTORS, CONDUCTOR_NOTES } from "../calc/constants";
 type Calc = ReturnType<typeof useCalculator>;
-interface Props { calc: Calc; theme: string; setTheme: (t: string) => void; }
+interface Props { calc: Calc; theme: string; setTheme: (t: string) => void; fontSize: string; setFontSize: (s: string) => void; }
 const RC = { small: "var(--c-success)", intermediate: "var(--c-warn)", large: "var(--c-primary)" };
 const RL = {
   small: "Kleine lus (C<0.2λ)",
@@ -77,7 +77,7 @@ function ConductorNotes({ conductorId, customMaterial }: { conductorId: string; 
   );
 }
 
-export default function Sidebar({ calc, theme, setTheme }: Props) {
+export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize }: Props) {
   const { inputs, setInput, setBand, results } = calc;
   const rc = RC[results.regime];
   const cond = CONDUCTORS[inputs.conductorId];
@@ -91,9 +91,18 @@ export default function Sidebar({ calc, theme, setTheme }: Props) {
       <div className="theme-nav">
         {["dark","light","contrast"].map(t => (
           <button key={t} className={"theme-btn"+(theme===t?" active":"")} onClick={()=>setTheme(t)}>
-            {t==="contrast"?"HIGH CONTRAST":t.toUpperCase()}
+            {t==="contrast"?"CONTRAST":t.toUpperCase()}
           </button>
         ))}
+      </div>
+      <div className="theme-nav" style={{ marginTop: 0 }}>
+        {[["small","A−"],["normal","A"],["large","A+"]].map(([s, label]) => (
+          <button key={s} className={"theme-btn"+(fontSize===s?" active":"")} onClick={()=>setFontSize(s)}
+            title={s==="small"?"Klein lettertype (85%)":s==="large"?"Groot lettertype (120%)":"Normaal lettertype"}>
+            {label}
+          </button>
+        ))}
+        <span style={{ fontSize: 8, color: 'var(--muted)', fontFamily: 'Share Tech Mono', alignSelf: 'center', paddingLeft: 4 }}>LETTERGROOTTE</span>
       </div>
       <div className="band-nav">
         {BAND_PRESETS.map((b,i)=>(

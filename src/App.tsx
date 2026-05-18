@@ -38,7 +38,8 @@ const TABS = [
 ];
 
 export default function App() {
-  const [theme, setTheme] = useState<string>('dark');
+  const [theme, setTheme] = useState<string>('light');
+  const [fontSize, setFontSize] = useState<string>('normal');
   const [activeTab, setActiveTab] = useState('details');
   const calc = useCalculator();
 
@@ -47,9 +48,14 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', t);
   }
 
+  function applyFontSize(s: string) {
+    setFontSize(s);
+    document.documentElement.setAttribute('data-fontsize', s);
+  }
+
   return (
     <>
-      <Sidebar calc={calc} theme={theme} setTheme={applyTheme} />
+      <Sidebar calc={calc} theme={theme} setTheme={applyTheme} fontSize={fontSize} setFontSize={applyFontSize} />
       <div className="main">
         <KpiDashboard results={calc.results} />
         <WarningPanel results={calc.results} inputs={calc.inputs} />
