@@ -35,6 +35,21 @@ const WARNS: Warn[] = [
     cond:(r,i)=>r.txPowerEffective<i.txPowerW },
   { id:"flex",   cls:"warn-danger",   msg:()=>"Flex kanaalduct: weerstand 3-10x verhoogd. INDICATIEF.",
     cond:(_,i)=>CONDUCTORS[i.conductorId]?.cat==="flex_duct" },
+  { id:"emf",    cls:"warn-warning",
+    msg:(r,i)=>`Veiligheidsafstand ${r.safeDistM.toFixed(1)} m (ICNIRP H-veld, 0.073 A/m). Bij ${i.txPowerW}W indoor: houd minimaal ${(r.safeDistM*1.5).toFixed(1)} m afstand (×1.5 marge).`,
+    cond:(r,i)=>i.txPowerW>10 },
+  { id:"emf_hpwr", cls:"warn-danger",
+    msg:(r)=>`Hoog vermogen: veiligheidsafstand ${(r.safeDistM*1.5).toFixed(1)}m. Nooit direct naast een zendende magloop staan!`,
+    cond:(r,i)=>i.txPowerW>=100&&r.safeDistM>1.5 },
+  { id:"lowhgt2",  cls:"warn-warning",
+    msg:()=>"Hoogte < 0.5m: grondverlies Re_gnd >100 mΩ verwacht — efficiency zwaar aangetast.",
+    cond:(r,i)=>i.groundType!=="free"&&i.height<0.5 },
+  { id:"nearobj",  cls:"warn-info",
+    msg:(r)=>`Nabij-veld zone ≈${(r.lambda/6.28).toFixed(1)}m. Metalen objecten binnen 3-6m kunnen R_loop verhogen en de lus detunen.`,
+    cond:(r,i)=>i.groundType!=="free"&&i.height<3&&r.plam<0.3 },
+  { id:"detune",   cls:"warn-warning",
+    msg:()=>"BW < 2kHz: thermische drift en windbeweging kunnen meetbare detuning veroorzaken. Aanbevolen: motorafstemming met encoder.",
+    cond:(r)=>r.BWkHz<2 },
 ];
 
 const NOTE_CLS: Record<string, string> = { info: 'warn-info', warn: 'warn-warning', danger: 'warn-danger' };

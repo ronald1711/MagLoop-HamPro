@@ -70,6 +70,7 @@ export interface CalcResult {
   transN2: number;
   magMoment: number;
   regime: 'small' | 'intermediate' | 'large';
+  safeDistM: number;
   steps: CalcStep[];
 }
 
@@ -230,6 +231,15 @@ export function magloopCalc(p: CalcInputs): CalcResult {
   const transN2 = Zin_res / 50;
   const magMoment = Ia * area * p.turns;
 
+  // EMF safety distance — ICNIRP 1998 general public H-field limit, 3-30 MHz: 0.073 A/m
+  // Near-field (r << λ/2π): H ≈ m/(4πr³) → r_NF = ∛(m/4πH_lim)
+  // Far-field (r >> λ/2π): H ≈ m·k²/(4πr) → r_FF = m·k²/(4π·H_lim)
+  const H_lim = 0.073; // A/m ICNIRP
+  const r_NF = Math.cbrt(magMoment / (4 * Math.PI * H_lim));
+  const r_FF = magMoment * k * k / (4 * Math.PI * H_lim);
+  const safeDistM = Math.max(r_NF, r_FF, 0.3);
+  steps.push({ label: 'Veiligheidsafstand (ICNIRP)', formula: 'R = ∛(m/4π·H_lim)  H_lim=0.073 A/m', value: `${safeDistM.toFixed(2)} m` });
+
   steps.push({ label: 'Max eff. apertuur A_em', formula: 'A_em = 3λ²/(8π) (Balanis 5-32)', value: `${Aem.toFixed(3)} m²` });
   steps.push({ label: 'Eff. vectorlengte ℓ_e', formula: 'ℓe = k·A·N (Balanis 5-40)', value: `${le_m.toFixed(4)} m` });
   steps.push({ label: 'Z_in resonantie', formula: "Z'_in = R_tot + X_L²/R_tot", value: `${Math.round(Zin_res)} Ω` });
@@ -244,7 +254,7 @@ export function magloopCalc(p: CalcInputs): CalcResult {
     XL, CpF, Q, BWkHz, eta, eta_fraction, VcapKV, Ia,
     txPowerEffective: txPower, ccable_pF, C_self_pF, CpF_req, f_min_MHz, conductorCat: cond.cat,
     D0_dBi, G_dBi, G_lin, Deff_dBi, Geff_dBi, gndBoost, AFmax,
-    Aem, le_m, coupDiam, Zin_res, transN2, magMoment,
+    Aem, le_m, coupDiam, Zin_res, transN2, magMoment, safeDistM,
     regime, steps,
   };
 }

@@ -17,6 +17,7 @@ import TabFreqSweep from './components/tabs/TabFreqSweep';
 import TabConductorComp from './components/tabs/TabConductorComp';
 import TabOptimizer from './components/tabs/TabOptimizer';
 import TabCapAssist from './components/tabs/TabCapAssist';
+import TabBuild from './components/tabs/TabBuild';
 
 const TABS = [
   { id: 'details',    label: 'Details' },
@@ -25,6 +26,7 @@ const TABS = [
   { id: 'optimizer', label: 'Optimizer' },
   { id: 'conductors',label: 'Geleiders' },
   { id: 'capassist', label: 'Condensator' },
+  { id: 'build',     label: 'Bouwlijst' },
   { id: 'pattern',   label: 'Patroon' },
   { id: 'ground',    label: 'Grondeffect' },
   { id: 'linkbudget',label: 'Linkbudget' },
@@ -66,12 +68,13 @@ export default function App() {
         {activeTab === 'optimizer'   && <TabOptimizer calc={calc} />}
         {activeTab === 'conductors'  && <TabConductorComp calc={calc} />}
         {activeTab === 'capassist'   && <TabCapAssist results={calc.results} />}
-        {activeTab === 'pattern'     && <TabPattern results={calc.results} />}
+        {activeTab === 'pattern'     && <TabPattern results={calc.results} inputs={calc.inputs} />}
         {activeTab === 'ground'      && <TabGround calc={calc} />}
         {activeTab === 'linkbudget'  && <TabLinkbudget calc={calc} />}
         {activeTab === 'noise'       && <TabNoise calc={calc} />}
         {activeTab === 'coupling'    && <TabCoupling results={calc.results} />}
         {activeTab === 'receive'     && <TabReceive results={calc.results} />}
+        {activeTab === 'build'       && <TabBuild results={calc.results} />}
         {activeTab === 'circuit'     && <TabCircuit results={calc.results} />}
         {activeTab === 'steps'       && <TabSteps steps={calc.results.steps} />}
       </div>

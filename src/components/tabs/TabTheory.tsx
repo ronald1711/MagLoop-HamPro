@@ -194,6 +194,76 @@ export default function TabTheory({ results: r }: Props) {
           <KV label="Mag. moment m" value={`${r.magMoment.toFixed(3)} A·m²`} />
         </div>
       </Section>
+
+      <Section title="Voedingsmethoden & Koppeling" badge="Faraday aanbevolen">
+        <p>De koppeling van de 50 Ω coax naar de hoog-impedante lus (Z_in = {Math.round(r.Zin_res)} Ω) vereist een impedantietransformatie van {r.transN2.toFixed(0)}:1.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, margin: '8px 0' }}>
+          {[
+            { name: 'Faraday loop', color: 'var(--c-success)', pros: 'Galv. sch., multi-band, 1 knop', cons: 'Iets grotere afmeting', rec: true },
+            { name: 'Capacitief', color: 'var(--c-primary)', pros: 'Compact', cons: '2 knoppen, geen galv. sch.', rec: false },
+            { name: 'Gamma match', color: 'var(--c-warn)', pros: 'Zeer compact', cons: '2 knoppen, common-mode!', rec: false },
+          ].map(m => (
+            <div key={m.name} style={{ background: 'var(--surface)', padding: 8, borderRadius: 4, borderLeft: `2px solid ${m.color}`, fontSize: 10 }}>
+              <div style={{ color: m.color, fontFamily: 'Share Tech Mono', marginBottom: 4 }}>{m.name}{m.rec ? ' ✓' : ''}</div>
+              <div style={{ color: 'var(--c-success)', fontSize: 9 }}>+ {m.pros}</div>
+              <div style={{ color: 'var(--c-danger)', fontSize: 9 }}>- {m.cons}</div>
+            </div>
+          ))}
+        </div>
+        <Formula text={`Faraday: d_coup = D × √(50 / Z_in)  →  ${(Math.sqrt(50/r.Zin_res)*r.coupDiam * 5*100).toFixed(0)} cm voor 50Ω match`} />
+        <p>De Faraday-lus is galvanisch gescheiden: geen DC-verbinding tussen antenne en coax. Dit onderdrukt common-mode stromen op de coaxmantel effectief.</p>
+        <KV label="Z_in resonantie" value={`${Math.round(r.Zin_res)} Ω`} />
+        <KV label="Optimale Faraday diameter" value={`${(Math.sqrt(50/r.Zin_res)*r.coupDiam * 5*100).toFixed(1)} cm`} color="var(--c-success)" />
+        <KV label="Standaard D/5 diameter" value={`${(r.coupDiam*100).toFixed(1)} cm`} />
+      </Section>
+
+      <Section title="Q/BW Referentietabel" badge={`Huidig Q=${Math.round(r.Q)}`}>
+        <p>Referentietabel: bandbreedte (kHz) bij typische Q-waarden voor verschillende HF-banden.</p>
+        <div style={{ overflowX: 'auto', marginTop: 8 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10, fontFamily: 'Share Tech Mono' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--muted)' }}>
+                <th style={{ textAlign: 'left', padding: '3px 8px' }}>Q</th>
+                {[1.85, 3.6, 7.1, 10.12, 14.15, 21.2, 28.5].map(f => (
+                  <th key={f} style={{ textAlign: 'right', padding: '3px 6px' }}>{f} MHz</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[300, 500, 800, 1000, 1500, 2000].map(q => {
+                const isCur = Math.abs(r.Q - q) < q * 0.2;
+                return (
+                  <tr key={q} style={{ borderBottom: '1px solid var(--border)', background: isCur ? 'rgba(88,166,255,0.08)' : undefined }}>
+                    <td style={{ padding: '3px 8px', color: isCur ? 'var(--c-primary)' : 'var(--text)' }}>{isCur ? '▶ ' : ''}{q}</td>
+                    {[1.85, 3.6, 7.1, 10.12, 14.15, 21.2, 28.5].map(f => {
+                      const bw = f * 1000 / q;
+                      return (
+                        <td key={f} style={{ textAlign: 'right', padding: '3px 6px', color: bw < 2 ? 'var(--c-danger)' : bw < 5 ? 'var(--c-warn)' : 'var(--muted)' }}>
+                          {bw.toFixed(1)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+              <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(88,166,255,0.12)', fontWeight: 'bold' }}>
+                <td style={{ padding: '3px 8px', color: 'var(--c-primary)' }}>Huidig ({Math.round(r.Q)})</td>
+                {[1.85, 3.6, 7.1, 10.12, 14.15, 21.2, 28.5].map(f => {
+                  const bw = f * 1000 / r.Q;
+                  return (
+                    <td key={f} style={{ textAlign: 'right', padding: '3px 6px', color: bw < 2 ? 'var(--c-danger)' : bw < 5 ? 'var(--c-warn)' : 'var(--c-primary)' }}>
+                      {bw.toFixed(1)}
+                    </td>
+                  );
+                })}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style={{ marginTop: 6, fontSize: 10, color: 'var(--muted)' }}>
+          Waarden in kHz. Rood &lt;2 kHz (detuningsgevoelig), oranje &lt;5 kHz (precisie-afstemming). Huidig: {r.BWkHz.toFixed(2)} kHz @ {(1e-6 / (2 * Math.PI * Math.sqrt(r.L_uH * 1e-6 * r.CpF * 1e-12))).toFixed(3)} MHz
+        </div>
+      </Section>
     </div>
   );
 }

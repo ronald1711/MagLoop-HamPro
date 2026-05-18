@@ -41,6 +41,7 @@ export default function TabDetails({ calc }: Props) {
             <SM label="R-Loop (mOhm)" value={results.rloop_m.toFixed(2)} color="var(--c-danger)"/>
             <SM label="Lusstroom (A)" value={results.Ia.toFixed(2)}/>
             <SM label="Skin Depth" value={results.skin_um.toFixed(1)+" um"}/>
+            <SM label="Min. diam. (20δ)" value={(results.skin_um*20/1000).toFixed(1)+" mm"} color={results.circumference_m/Math.PI*1000 < results.skin_um*20 ? "var(--c-warn)" : "var(--muted)"}/>
           </div>
         </div>
       </div>
