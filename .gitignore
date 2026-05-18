@@ -1,0 +1,6 @@
+node_modules/
+dist/
+agentdb.rvf
+agentdb.rvf.lock
+knowledge/
+*.html.bak

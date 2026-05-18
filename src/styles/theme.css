@@ -1,0 +1,15 @@
+:root {
+  --bg:#0d1117; --panel:#161b22; --border:#30363d;
+  --c-primary:#58a6ff; --c-success:#3fb950; --c-warn:#d29922; --c-danger:#f78166;
+  --text:#c9d1d9; --text-bold:#ffffff; --muted:#8b949e; --card-bg:rgba(255,255,255,0.03);
+}
+[data-theme="light"] {
+  --bg:#f6f8fa; --panel:#ffffff; --border:#d0d7de;
+  --c-primary:#0969da; --c-success:#1a7f37; --c-warn:#9a6700; --c-danger:#cf222e;
+  --text:#24292f; --text-bold:#000000; --muted:#57606a; --card-bg:#f3f4f6;
+}
+[data-theme="contrast"] {
+  --bg:#000000; --panel:#000000; --border:#ffffff;
+  --c-primary:#ffff00; --c-success:#00ff00; --c-warn:#ffff00; --c-danger:#ff0000;
+  --text:#ffffff; --text-bold:#ffffff; --muted:#ffffff; --card-bg:#000000;
+}
