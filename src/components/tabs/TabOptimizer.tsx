@@ -99,12 +99,12 @@ export default function TabOptimizer({ calc }: Props) {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="chart-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div>
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#3fb950', marginBottom: 4 }}>
             Efficiëntie η (%) — huidig: {results.eta.toFixed(2)}%
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={{ labels, datasets: [mkDataset(etas, '#3fb950'), mkMarker(markerAt(etas), '#f78166'), mkOptMarker(etas, maxEtaIdx, '#3fb950')] }} options={makeOpts('η (%)', '#3fb950')} />
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function TabOptimizer({ calc }: Props) {
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#58a6ff', marginBottom: 4 }}>
             Q-Factor — huidig: {Math.round(results.Q)}
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={{ labels, datasets: [mkDataset(qs, '#58a6ff'), mkMarker(markerAt(qs), '#f78166'), mkOptMarker(qs, maxQIdx, '#58a6ff')] }} options={makeOpts('Q', '#58a6ff')} />
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function TabOptimizer({ calc }: Props) {
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#d2a8ff', marginBottom: 4 }}>
             V_cap (kV) — huidig: {results.VcapKV.toFixed(2)} kV
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={{ labels, datasets: [mkDataset(vcaps, '#d2a8ff'), mkMarker(markerAt(vcaps), '#f78166'), mkOptMarker(vcaps, minVcapIdx, '#d2a8ff')] }} options={makeOpts('V_cap (kV)', '#d2a8ff')} />
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function TabOptimizer({ calc }: Props) {
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#ffa657', marginBottom: 4 }}>
             Bandbreedte BW (kHz) — huidig: {results.BWkHz.toFixed(2)} kHz
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={{ labels, datasets: [mkDataset(bws, '#ffa657'), mkMarker(markerAt(bws), '#f78166'), mkOptMarker(bws, maxBwIdx, '#ffa657')] }} options={makeOpts('BW (kHz)', '#ffa657')} />
           </div>
         </div>

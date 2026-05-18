@@ -113,7 +113,61 @@
   .info-box{background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:12px;line-height:1.7;}
   .info-box strong{color:var(--c-primary);}
 
-  @media(max-width:1000px){body{flex-direction:column;overflow:auto;}.sidebar{width:100%;height:auto;}}
+  /* ── Hamburger bar (mobile only) ────────────────────── */
+  .hamburger-bar { display:none; position:fixed; top:0; left:0; right:0; height:48px;
+    z-index:99; background:var(--panel); border-bottom:1px solid var(--border);
+    align-items:center; padding:0 14px; gap:10px; }
+  .hamburger-btn { display:flex; flex-direction:column; gap:5px; background:none;
+    border:none; cursor:pointer; padding:4px; }
+  .hamburger-btn span { display:block; width:20px; height:2px; background:var(--text); border-radius:2px; }
+
+  /* ── Sidebar close button (hidden on desktop) ────────── */
+  .sidebar-close-btn { display:none; width:100%; padding:8px 12px; background:var(--card-bg);
+    border:1px solid var(--border); border-radius:4px; color:var(--muted);
+    font-family:'Share Tech Mono'; font-size:10px; cursor:pointer; text-align:left; }
+
+  /* ── Sidebar overlay (dim background) ───────────────── */
+  .sidebar-overlay { position:fixed; inset:0; z-index:98; background:rgba(0,0,0,0.45); }
+
+  /* ── Mobile + Tablet: show hamburger bar ≤ 1024px ─────── */
+  @media (max-width: 1024px) {
+    .hamburger-bar { display:flex; }
+  }
+
+  /* ── Mobile: ≤ 640px ─────────────────────────────────── */
+  @media (max-width: 640px) {
+    .sidebar-close-btn { display:block; }
+    .sidebar {
+      position:fixed; top:0; left:0; height:100dvh;
+      width:min(310px, 90vw); z-index:100;
+      transform:translateX(-110%); transition:transform 0.25s ease;
+    }
+    .sidebar[data-open="true"] { transform:translateX(0); }
+    .main { padding-top:56px; }
+    .chart-grid-2col { grid-template-columns:1fr !important; }
+    .chart-row-height { height:200px !important; }
+    .dashboard-grid { grid-template-columns:repeat(2,1fr) !important; }
+  }
+
+  /* ── Tablet: 641px – 1024px ─────────────────────────── */
+  @media (min-width:641px) and (max-width:1024px) {
+    .sidebar-close-btn { display:block; }
+    .sidebar {
+      position:fixed; top:0; left:0; height:100dvh; z-index:100;
+      transform:translateX(0); transition:transform 0.25s ease;
+    }
+    .sidebar[data-open="false"] { transform:translateX(-110%); }
+    .main { padding-top:56px; }
+  }
+
+  /* ── Tab nav: horizontal scroll on small screens ─────── */
+  @media (max-width: 900px) {
+    .tab-nav { flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      scrollbar-width:none; padding-bottom:2px; }
+    .tab-nav::-webkit-scrollbar { display:none; }
+    .tab-btn { white-space:nowrap; flex-shrink:0; }
+  }
+
 /* React app root */
 #root{display:flex;width:100%;min-height:100vh;}
 

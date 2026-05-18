@@ -64,12 +64,12 @@ export default function TabFreqSweep({ calc }: Props) {
         Alle parameters berekend met de huidige lus-instellingen. Rode stip = huidige frequentie ({inputs.fMHz.toFixed(3)} MHz).
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="chart-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div>
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#3fb950', marginBottom: 4 }}>
             Efficiëntie η (%) — huidig: {results.eta.toFixed(2)}%
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={etaData} options={makeOpts('Efficiëntie (%)', '#3fb950', 0)} />
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function TabFreqSweep({ calc }: Props) {
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#58a6ff', marginBottom: 4 }}>
             Q-Factor — huidig: {Math.round(results.Q)}
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={qData} options={makeOpts('Q-factor', '#58a6ff', 0)} />
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function TabFreqSweep({ calc }: Props) {
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#d2a8ff', marginBottom: 4 }}>
             V_cap (kV RMS) — huidig: {results.VcapKV.toFixed(2)} kV
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={vcapData} options={makeOpts('V_cap (kV)', '#d2a8ff', 0)} />
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function TabFreqSweep({ calc }: Props) {
           <div style={{ fontSize: 10, fontFamily: MONO, color: '#ffa657', marginBottom: 4 }}>
             C_tune req (pF) — huidig: {results.CpF_req <= 0 ? 'ONMOGELIJK' : results.CpF_req.toFixed(1) + ' pF'}
           </div>
-          <div style={{ height: 160 }}>
+          <div className="chart-row-height" style={{ height: 160 }}>
             <Line data={ctuneData} options={makeOpts('C_req (pF)', '#ffa657', 0)} />
           </div>
         </div>

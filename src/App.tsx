@@ -41,6 +41,7 @@ export default function App() {
   const [theme, setTheme] = useState<string>('light');
   const [fontSize, setFontSize] = useState<string>('normal');
   const [activeTab, setActiveTab] = useState('details');
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 640);
   const calc = useCalculator();
 
   function applyTheme(t: string) {
@@ -51,12 +52,41 @@ export default function App() {
   function applyFontSize(s: string) {
     setFontSize(s);
     document.documentElement.setAttribute('data-fontsize', s);
+    // Give DOM time to apply zoom, then notify Chart.js to recalculate canvas sizes
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
   }
+
+  function openSidebar() { setSidebarOpen(true); }
+  function closeSidebar() { setSidebarOpen(false); }
 
   return (
     <>
-      <Sidebar calc={calc} theme={theme} setTheme={applyTheme} fontSize={fontSize} setFontSize={applyFontSize} />
+      {/* Dim overlay — tapped to close sidebar on mobile/tablet */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={closeSidebar} />
+      )}
+
+      <Sidebar
+        calc={calc}
+        theme={theme} setTheme={applyTheme}
+        fontSize={fontSize} setFontSize={applyFontSize}
+        isOpen={sidebarOpen} onClose={closeSidebar}
+      />
+
       <div className="main">
+        {/* Hamburger bar — only visible on mobile via CSS */}
+        <div className="hamburger-bar">
+          <button className="hamburger-btn" onClick={openSidebar} aria-label="Open instellingen">
+            <span />
+            <span />
+            <span />
+          </button>
+          <span style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: 16, letterSpacing: 1 }}>
+            MagLoop <span style={{ color: 'var(--c-primary)' }}>HamPro</span>
+          </span>
+          <span style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: 'var(--muted)', marginLeft: 'auto' }}>V1.0 PC3Y</span>
+        </div>
+
         <KpiDashboard results={calc.results} />
         <WarningPanel results={calc.results} inputs={calc.inputs} />
         <nav className="tab-nav">

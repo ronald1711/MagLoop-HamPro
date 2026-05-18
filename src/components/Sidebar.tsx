@@ -1,7 +1,7 @@
 import type { useCalculator } from "../hooks/useCalculator";
 import { BAND_PRESETS, CONDUCTORS, CONDUCTOR_NOTES } from "../calc/constants";
 type Calc = ReturnType<typeof useCalculator>;
-interface Props { calc: Calc; theme: string; setTheme: (t: string) => void; fontSize: string; setFontSize: (s: string) => void; }
+interface Props { calc: Calc; theme: string; setTheme: (t: string) => void; fontSize: string; setFontSize: (s: string) => void; isOpen: boolean; onClose: () => void; }
 const RC = { small: "var(--c-success)", intermediate: "var(--c-warn)", large: "var(--c-primary)" };
 const RL = {
   small: "Kleine lus (C<0.2λ)",
@@ -77,7 +77,7 @@ function ConductorNotes({ conductorId, customMaterial }: { conductorId: string; 
   );
 }
 
-export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize }: Props) {
+export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize, isOpen, onClose }: Props) {
   const { inputs, setInput, setBand, results } = calc;
   const rc = RC[results.regime];
   const cond = CONDUCTORS[inputs.conductorId];
@@ -85,7 +85,9 @@ export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize }
   const isFlexOrTape = cond?.cat === 'flex_duct' || (cond?.cat === 'flat_strip' && inputs.conductorId.includes('tape'));
 
   return (
-    <div className="sidebar">
+    <div className="sidebar" data-open={isOpen ? 'true' : 'false'}>
+      {/* Close button — only visible on mobile/tablet via CSS */}
+      <button className="sidebar-close-btn" onClick={onClose} aria-label="Sluit zijbalk">✕ Sluiten</button>
       <h1>MagLoop <span>HamPro</span></h1>
       <div className="version-tag">V1.0 by PC3Y</div>
       <div className="theme-nav">
