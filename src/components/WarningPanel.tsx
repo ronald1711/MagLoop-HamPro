@@ -60,12 +60,12 @@ export default function WarningPanel({ results, inputs }: Props) {
   const condNotes = cond ? cond.notes.map(k => ({ key: k, note: CONDUCTOR_NOTES[k] })).filter(x => x.note) : [];
   if (active.length === 0 && condNotes.length === 0) return null;
   return (
-    <div className="warn-container">
+    <div className="warn-container" aria-live="polite" aria-atomic="false" role="status">
       {condNotes.map(({ key, note }) => (
-        <div key={key} className={"warn-item " + NOTE_CLS[note.level]}>{note.text}</div>
+        <div key={key} className={"warn-item " + NOTE_CLS[note.level]} role={note.level === 'danger' ? 'alert' : undefined}>{note.text}</div>
       ))}
       {active.map(w => (
-        <div key={w.id} className={"warn-item "+w.cls}>{w.msg(results, inputs)}</div>
+        <div key={w.id} className={"warn-item "+w.cls} role={w.cls === 'warn-danger' ? 'alert' : undefined}>{w.msg(results, inputs)}</div>
       ))}
     </div>
   );

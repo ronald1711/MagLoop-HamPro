@@ -53,10 +53,13 @@ export default function KpiDashboard({ results }: Props) {
         return (
           <div key={card.id} className="stat-card"
             style={{ borderBottom: "3px solid "+card.color }}
-            title={card.tip}>
-            <div className="stat-formula">{card.formula}</div>
-            <span className="stat-label">{card.label}</span>
-            <span className="stat-val" style={gainColor ? { color: gainColor } : undefined}>
+            title={card.tip}
+            tabIndex={0}
+            role="img"
+            aria-label={`${card.label}: ${card.value(results)}. Formule: ${card.formula}. ${card.tip}`}>
+            <div className="stat-formula" aria-hidden="true">{card.formula}</div>
+            <span className="stat-label" aria-hidden="true">{card.label}</span>
+            <span className="stat-val" style={gainColor ? { color: gainColor } : undefined} aria-hidden="true">
               {card.value(results)}
             </span>
           </div>

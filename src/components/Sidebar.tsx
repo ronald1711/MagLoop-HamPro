@@ -85,7 +85,7 @@ export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize, 
   const isFlexOrTape = cond?.cat === 'flex_duct' || (cond?.cat === 'flat_strip' && inputs.conductorId.includes('tape'));
 
   return (
-    <div className="sidebar" data-open={isOpen ? 'true' : 'false'}>
+    <aside className="sidebar" data-open={isOpen ? 'true' : 'false'} aria-label="Instellingen en invoer">
       {/* Close button — only visible on mobile/tablet via CSS */}
       <button className="sidebar-close-btn" onClick={onClose} aria-label="Sluit zijbalk">✕ Sluiten</button>
       <h1>MagLoop <span>HamPro</span></h1>
@@ -126,13 +126,15 @@ export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize, 
         </select>
       </CG>
       <CG tip="Werkfrequentie in MHz. Hogere frequentie = kleiner λ = hogere R_rad = betere efficiëntie voor dezelfde lus. Gebruik de bandknoppen bovenaan voor snelle selectie.">
-        <label>Frequentie <span>{inputs.fMHz.toFixed(3)} MHz</span></label>
-        <input type="range" min="1.8" max="30" step="0.01" value={inputs.fMHz}
+        <label htmlFor="sl-freq">Frequentie <span>{inputs.fMHz.toFixed(3)} MHz</span></label>
+        <input id="sl-freq" type="range" min="1.8" max="30" step="0.01" value={inputs.fMHz}
+          aria-label="Frequentie in MHz" aria-valuetext={`${inputs.fMHz.toFixed(3)} MHz`}
           onChange={e=>setInput("fMHz",parseFloat(e.target.value))}/>
       </CG>
       <CG tip="Buitendiameter van de lus (cirkel) of zijlengte (vierkant). Groter = meer inductantie L, hogere Q maar ook hogere V_cap. Typisch 0.5–2m voor HF.">
-        <label>Loop Diameter (m) <span>{inputs.loopDiameterM.toFixed(2)}</span></label>
-        <input type="range" min="0.2" max="3.0" step="0.01" value={inputs.loopDiameterM}
+        <label htmlFor="sl-diam">Loop Diameter (m) <span>{inputs.loopDiameterM.toFixed(2)}</span></label>
+        <input id="sl-diam" type="range" min="0.2" max="3.0" step="0.01" value={inputs.loopDiameterM}
+          aria-label="Loop diameter in meter" aria-valuetext={`${inputs.loopDiameterM.toFixed(2)} m`}
           onChange={e=>setInput("loopDiameterM",parseFloat(e.target.value))}/>
       </CG>
       <CG tip="Geleidermateriaal en doorsnede. Koper (Cu) heeft laagste ρ=1.72×10⁻⁸ Ω·m. Grotere diameter = lagere huidweerstand R_s = hogere Q. Coax: buitengeleider als lusleider bij N=1.">
@@ -174,14 +176,16 @@ export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize, 
         )}
       </CG>
       <CG tip="Aantal windingen N. Bij N>1 stijgt L met N², maar ook R_loop en proximity-verlies. Meerwinding nuttig op lagere banden. Spacing ratio c/a moet ≥2 zijn voor lage proximity-verlies.">
-        <label>Windingen (N) <span>{inputs.turns}</span></label>
-        <input type="range" min="1" max="10" step="1" value={inputs.turns}
+        <label htmlFor="sl-turns">Windingen (N) <span>{inputs.turns}</span></label>
+        <input id="sl-turns" type="range" min="1" max="10" step="1" value={inputs.turns}
+          aria-label="Aantal windingen" aria-valuetext={`${inputs.turns} windingen`}
           onChange={e=>setInput("turns",parseInt(e.target.value))}/>
       </CG>
       {inputs.turns>1&&(
         <CG tip="Verhouding van draad-middelpunt-afstand tot draaddiameter (c/a). c/a=2 = draden raken bijna. Proximity-effect verhoogt R_loop bij kleine c/a. Aanbevolen: c/a ≥ 3.">
-          <label>Spacing Ratio (c/a) <span>{inputs.spacingRatio.toFixed(1)}</span></label>
-          <input type="range" min="1.1" max="10" step="0.1" value={inputs.spacingRatio}
+          <label htmlFor="sl-spacing">Spacing Ratio (c/a) <span>{inputs.spacingRatio.toFixed(1)}</span></label>
+          <input id="sl-spacing" type="range" min="1.1" max="10" step="0.1" value={inputs.spacingRatio}
+            aria-label="Spacing ratio c/a" aria-valuetext={`${inputs.spacingRatio.toFixed(1)}`}
             onChange={e=>setInput("spacingRatio",parseFloat(e.target.value))}/>
         </CG>
       )}
@@ -201,13 +205,14 @@ export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize, 
           onChange={e=>setInput("txPowerW",parseFloat(e.target.value))}/>
       </CG>
       <CG tip="Hoogte van het luscentrum boven het grondvlak. Bij h<0.1λ is grondverlies dominant. Optimale directiviteitswinst bij h=λ/4 via image theory. Laag = meer grondverlies, hoog = minder grondinteractie.">
-        <label>Hoogte boven grond <span>{inputs.height.toFixed(1)} m</span></label>
-        <input type="range" min="0" max="20" step="0.1" value={inputs.height}
+        <label htmlFor="sl-height">Hoogte boven grond <span>{inputs.height.toFixed(1)} m</span></label>
+        <input id="sl-height" type="range" min="0" max="20" step="0.1" value={inputs.height}
+          aria-label="Hoogte boven grond in meter" aria-valuetext={`${inputs.height.toFixed(1)} meter`}
           onChange={e=>setInput("height",parseFloat(e.target.value))}/>
       </CG>
       <CG tip="Bepaalt reflectiecoëfficiënt Γ voor image theory berekening. Perfecte geleider: Γ=1 (max winst). Goede grond/gras: Γ=0.82. Slechte grond/asfalt: Γ=0.50. Vrije ruimte: geen grondeffect.">
-        <label>Grondtype</label>
-        <select value={inputs.groundType}
+        <label htmlFor="sel-ground">Grondtype</label>
+        <select id="sel-ground" value={inputs.groundType}
           onChange={e=>setInput("groundType",e.target.value as "perfect"|"good"|"poor"|"free")}>
           <option value="perfect">Perfecte geleider (Γ=1.0)</option>
           <option value="good">Goede grond / gras (Γ=0.82)</option>
@@ -215,6 +220,6 @@ export default function Sidebar({ calc, theme, setTheme, fontSize, setFontSize, 
           <option value="free">Vrije ruimte (geen grond)</option>
         </select>
       </CG>
-    </div>
+    </aside>
   );
 }

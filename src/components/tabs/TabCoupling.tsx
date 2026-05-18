@@ -37,13 +37,15 @@ export default function TabCoupling({ results: r }: Props) {
         {METHODS.map(m => (
           <button key={m.id}
             onClick={() => setMethod(m.id)}
+            aria-pressed={method === m.id}
+            aria-label={`${m.label} — ${m.badge}`}
             style={{
               flex: 1, padding: '8px 6px', borderRadius: 6, cursor: 'pointer', border: `1px solid ${method === m.id ? m.color : 'var(--border)'}`,
               background: method === m.id ? m.color + '18' : 'var(--surface)', color: method === m.id ? m.color : 'var(--muted)',
               fontFamily: 'Share Tech Mono', fontSize: 10, transition: 'all 0.15s'
             }}>
             <div style={{ fontWeight: 600, marginBottom: 2 }}>{m.label}</div>
-            <div style={{ fontSize: 8, opacity: 0.8 }}>{m.badge}</div>
+            <div style={{ fontSize: 8, opacity: 0.8 }} aria-hidden="true">{m.badge}</div>
           </button>
         ))}
       </div>
@@ -132,14 +134,15 @@ export default function TabCoupling({ results: r }: Props) {
       <div className="info-box" style={{ marginTop: 14 }}>
         <div style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: 'var(--c-primary)', marginBottom: 8 }}>VERGELIJKINGSTABEL</div>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10, fontFamily: 'Share Tech Mono' }}>
+          <caption className="sr-only">Vergelijking van koppelingmethoden: galvanische scheiding, multiband-geschiktheid, aantal afstemknoppen, QRO-geschiktheid en aanbeveling</caption>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--muted)' }}>
-              <th style={{ textAlign: 'left', padding: '3px 6px' }}>Methode</th>
-              <th style={{ textAlign: 'center', padding: '3px 4px' }}>Galv. sch.</th>
-              <th style={{ textAlign: 'center', padding: '3px 4px' }}>Multi-band</th>
-              <th style={{ textAlign: 'center', padding: '3px 4px' }}>Knoppen</th>
-              <th style={{ textAlign: 'center', padding: '3px 4px' }}>QRO</th>
-              <th style={{ textAlign: 'left', padding: '3px 4px' }}>Aanbeveling</th>
+              <th scope="col" style={{ textAlign: 'left', padding: '3px 6px' }}>Methode</th>
+              <th scope="col" style={{ textAlign: 'center', padding: '3px 4px' }}>Galv. sch.</th>
+              <th scope="col" style={{ textAlign: 'center', padding: '3px 4px' }}>Multi-band</th>
+              <th scope="col" style={{ textAlign: 'center', padding: '3px 4px' }}>Knoppen</th>
+              <th scope="col" style={{ textAlign: 'center', padding: '3px 4px' }}>QRO</th>
+              <th scope="col" style={{ textAlign: 'left', padding: '3px 4px' }}>Aanbeveling</th>
             </tr>
           </thead>
           <tbody>
@@ -150,7 +153,7 @@ export default function TabCoupling({ results: r }: Props) {
               { name: 'Ferriet trafo', galv: '✓', multi: '✓', knobs: '1', qro: '✗', rec: 'Max 100W', color: 'var(--muted)' },
             ].map(row => (
               <tr key={row.name} style={{ borderBottom: '1px solid var(--border)', background: method === row.name.toLowerCase().replace(' ', '') ? row.color + '11' : undefined }}>
-                <td style={{ padding: '3px 6px', color: row.color }}>{row.name}</td>
+                <th scope="row" style={{ padding: '3px 6px', color: row.color, textAlign: 'left', fontWeight: 'normal' }}>{row.name}</th>
                 <td style={{ textAlign: 'center', padding: '3px 4px', color: row.galv === '✓' ? 'var(--c-success)' : row.galv === '✗' ? 'var(--c-danger)' : 'var(--c-warn)' }}>{row.galv}</td>
                 <td style={{ textAlign: 'center', padding: '3px 4px', color: row.multi === '✓' ? 'var(--c-success)' : 'var(--c-danger)' }}>{row.multi}</td>
                 <td style={{ textAlign: 'center', padding: '3px 4px' }}>{row.knobs}</td>

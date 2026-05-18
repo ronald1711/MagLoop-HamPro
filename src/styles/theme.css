@@ -1,7 +1,7 @@
 :root {
   --bg:#0d1117; --panel:#161b22; --border:#30363d;
-  --c-primary:#58a6ff; --c-success:#3fb950; --c-warn:#d29922; --c-danger:#f78166;
-  --text:#c9d1d9; --text-bold:#ffffff; --muted:#8b949e; --card-bg:rgba(255,255,255,0.03);
+  --c-primary:#58a6ff; --c-success:#3fb950; --c-warn:#e3a818; --c-danger:#f78166;
+  --text:#c9d1d9; --text-bold:#ffffff; --muted:#9ba4b0; --card-bg:rgba(255,255,255,0.03);
 }
 [data-theme="light"] {
   --bg:#f6f8fa; --panel:#ffffff; --border:#d0d7de;

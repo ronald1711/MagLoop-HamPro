@@ -90,15 +90,17 @@ export default function TabBuild({ results }: Props) {
     <div>
       <div className="section-title">Constructie Checklist</div>
       <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center' }}>
-        <div style={{ flex: 1, background: 'var(--border)', borderRadius: 4, height: 8 }}>
+        <div style={{ flex: 1, background: 'var(--border)', borderRadius: 4, height: 8 }}
+          role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}
+          aria-label={`Voortgang: ${doneItems} van ${totalItems} items afgerond`}>
           <div style={{ width: `${pct}%`, background: pct === 100 ? 'var(--c-success)' : 'var(--c-primary)', height: 8, borderRadius: 4, transition: 'width 0.3s' }} />
         </div>
-        <span style={{ fontFamily: 'Share Tech Mono', fontSize: 11, color: 'var(--c-primary)', whiteSpace: 'nowrap' }}>
+        <span style={{ fontFamily: 'Share Tech Mono', fontSize: 11, color: 'var(--c-primary)', whiteSpace: 'nowrap' }} aria-live="polite">
           {doneItems}/{totalItems} ({pct}%)
         </span>
         {dangerItems > 0 && (
-          <span style={{ fontFamily: 'Share Tech Mono', fontSize: 10, color: 'var(--c-danger)', whiteSpace: 'nowrap' }}>
-            ⚠ {dangerItems} veiligheids-items open
+          <span style={{ fontFamily: 'Share Tech Mono', fontSize: 10, color: 'var(--c-danger)', whiteSpace: 'nowrap' }} aria-live="polite">
+            <span aria-hidden="true">⚠</span> {dangerItems} veiligheids-items open
           </span>
         )}
         <button onClick={() => setChecked({})}
@@ -119,25 +121,33 @@ export default function TabBuild({ results }: Props) {
             const dynamicText = item.dynamic?.(results);
             return (
               <div key={item.id} style={{ border: `1px solid ${done ? 'var(--border)' : style.border}`, borderRadius: 5, marginBottom: 5, background: done ? 'rgba(0,0,0,0.1)' : style.bg, opacity: done ? 0.6 : 1, transition: 'all 0.15s' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={done} onChange={() => toggle(item.id)}
-                    style={{ width: 16, height: 16, cursor: 'pointer', accentColor: 'var(--c-primary)' }} />
-                  <span style={{ flex: 1, fontSize: 11, textDecoration: done ? 'line-through' : 'none', color: done ? 'var(--muted)' : 'var(--text)' }}>
-                    <span style={{ color: done ? 'var(--muted)' : (item.level === 'danger' ? 'var(--c-danger)' : item.level === 'warn' ? 'var(--c-warn)' : 'var(--c-success)'), marginRight: 6 }}>{style.icon}</span>
-                    {item.text}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px' }}>
+                  {/* Checkbox wrapped in label for WCAG 3.3.2 */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={done} onChange={() => toggle(item.id)}
+                      style={{ width: 16, height: 16, cursor: 'pointer', accentColor: 'var(--c-primary)', flexShrink: 0 }} />
+                    <span style={{ flex: 1, fontSize: 11, textDecoration: done ? 'line-through' : 'none', color: done ? 'var(--muted)' : 'var(--text)' }}>
+                      <span aria-hidden="true" style={{ color: done ? 'var(--muted)' : (item.level === 'danger' ? 'var(--c-danger)' : item.level === 'warn' ? 'var(--c-warn)' : 'var(--c-success)'), marginRight: 6 }}>{style.icon}</span>
+                      {item.text}
+                    </span>
+                  </label>
                   {dynamicText && !done && (
-                    <span style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: item.level === 'danger' ? 'var(--c-danger)' : 'var(--c-warn)', whiteSpace: 'nowrap' }}>{dynamicText}</span>
+                    <span style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: item.level === 'danger' ? 'var(--c-danger)' : 'var(--c-warn)', whiteSpace: 'nowrap' }} aria-label={dynamicText}>{dynamicText}</span>
                   )}
                   {(item.detail) && (
-                    <span onClick={e => { e.stopPropagation(); toggleExp(item.id); }}
-                      style={{ color: 'var(--muted)', fontSize: 10, cursor: 'pointer', padding: '0 4px' }}>
+                    /* Button for keyboard accessibility — WCAG 2.1.1 */
+                    <button
+                      onClick={() => toggleExp(item.id)}
+                      aria-expanded={open}
+                      aria-controls={`detail-${item.id}`}
+                      aria-label={open ? 'Verberg detail' : 'Toon detail'}
+                      style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: 10, cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}>
                       {open ? '▲' : '▼'}
-                    </span>
+                    </button>
                   )}
                 </div>
                 {open && item.detail && (
-                  <div style={{ padding: '0 10px 8px 36px', fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
+                  <div id={`detail-${item.id}`} style={{ padding: '0 10px 8px 36px', fontSize: 10, color: 'var(--muted)', lineHeight: 1.6 }}>
                     {item.detail}
                   </div>
                 )}

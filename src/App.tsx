@@ -52,7 +52,6 @@ export default function App() {
   function applyFontSize(s: string) {
     setFontSize(s);
     document.documentElement.setAttribute('data-fontsize', s);
-    // Give DOM time to apply zoom, then notify Chart.js to recalculate canvas sizes
     setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
   }
 
@@ -61,9 +60,11 @@ export default function App() {
 
   return (
     <>
-      {/* Dim overlay — tapped to close sidebar on mobile/tablet */}
+      {/* Skip navigation — WCAG 2.4.1 */}
+      <a href="#main-content" className="skip-link">Spring naar inhoud</a>
+
       {sidebarOpen && (
-        <div className="sidebar-overlay" onClick={closeSidebar} />
+        <div className="sidebar-overlay" onClick={closeSidebar} aria-hidden="true" role="presentation" />
       )}
 
       <Sidebar
@@ -73,8 +74,8 @@ export default function App() {
         isOpen={sidebarOpen} onClose={closeSidebar}
       />
 
-      <div className="main">
-        {/* Hamburger bar — only visible on mobile via CSS */}
+      <main className="main" id="main-content">
+        {/* Hamburger bar — mobile/tablet only */}
         <div className="hamburger-bar">
           <button className="hamburger-btn" onClick={openSidebar} aria-label="Open instellingen">
             <span />
@@ -84,36 +85,50 @@ export default function App() {
           <span style={{ fontFamily: 'Barlow Condensed', fontWeight: 900, fontSize: 16, letterSpacing: 1 }}>
             MagLoop <span style={{ color: 'var(--c-primary)' }}>HamPro</span>
           </span>
-          <span style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: 'var(--muted)', marginLeft: 'auto' }}>V1.0 PC3Y</span>
+          <span style={{ fontFamily: 'Share Tech Mono', fontSize: 9, color: 'var(--muted)', marginLeft: 'auto' }} aria-hidden="true">V1.0 PC3Y</span>
         </div>
 
         <KpiDashboard results={calc.results} />
         <WarningPanel results={calc.results} inputs={calc.inputs} />
-        <nav className="tab-nav">
+
+        {/* Tab navigation — WCAG 4.1.2, 1.3.1 */}
+        <nav className="tab-nav" role="tablist" aria-label="Secties">
           {TABS.map(t => (
             <button
               key={t.id}
+              id={`tab-${t.id}`}
               className={"tab-btn" + (activeTab === t.id ? " active" : "")}
+              role="tab"
+              aria-selected={activeTab === t.id}
+              aria-controls={`panel-${t.id}`}
               onClick={() => setActiveTab(t.id)}
             >{t.label}</button>
           ))}
         </nav>
-        {activeTab === 'details'     && <TabDetails calc={calc} />}
-        {activeTab === 'theory'      && <TabTheory results={calc.results} />}
-        {activeTab === 'freqsweep'   && <TabFreqSweep calc={calc} />}
-        {activeTab === 'optimizer'   && <TabOptimizer calc={calc} />}
-        {activeTab === 'conductors'  && <TabConductorComp calc={calc} />}
-        {activeTab === 'capassist'   && <TabCapAssist results={calc.results} />}
-        {activeTab === 'pattern'     && <TabPattern results={calc.results} inputs={calc.inputs} />}
-        {activeTab === 'ground'      && <TabGround calc={calc} />}
-        {activeTab === 'linkbudget'  && <TabLinkbudget calc={calc} />}
-        {activeTab === 'noise'       && <TabNoise calc={calc} />}
-        {activeTab === 'coupling'    && <TabCoupling results={calc.results} />}
-        {activeTab === 'receive'     && <TabReceive results={calc.results} />}
-        {activeTab === 'build'       && <TabBuild results={calc.results} />}
-        {activeTab === 'circuit'     && <TabCircuit results={calc.results} />}
-        {activeTab === 'steps'       && <TabSteps steps={calc.results.steps} />}
-      </div>
+
+        {/* Single tabpanel wrapper — WCAG 4.1.2 */}
+        <div
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+        >
+          {activeTab === 'details'     && <TabDetails calc={calc} />}
+          {activeTab === 'theory'      && <TabTheory results={calc.results} />}
+          {activeTab === 'freqsweep'   && <TabFreqSweep calc={calc} />}
+          {activeTab === 'optimizer'   && <TabOptimizer calc={calc} />}
+          {activeTab === 'conductors'  && <TabConductorComp calc={calc} />}
+          {activeTab === 'capassist'   && <TabCapAssist results={calc.results} />}
+          {activeTab === 'pattern'     && <TabPattern results={calc.results} inputs={calc.inputs} />}
+          {activeTab === 'ground'      && <TabGround calc={calc} />}
+          {activeTab === 'linkbudget'  && <TabLinkbudget calc={calc} />}
+          {activeTab === 'noise'       && <TabNoise calc={calc} />}
+          {activeTab === 'coupling'    && <TabCoupling results={calc.results} />}
+          {activeTab === 'receive'     && <TabReceive results={calc.results} />}
+          {activeTab === 'build'       && <TabBuild results={calc.results} />}
+          {activeTab === 'circuit'     && <TabCircuit results={calc.results} />}
+          {activeTab === 'steps'       && <TabSteps steps={calc.results.steps} />}
+        </div>
+      </main>
     </>
   );
 }

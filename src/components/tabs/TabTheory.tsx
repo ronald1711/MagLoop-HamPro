@@ -5,20 +5,24 @@ interface Props { results: CalcResult; }
 
 function Section({ title, badge, children }: { title: string; badge?: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const id = title.replace(/\s+/g, '-').toLowerCase();
   return (
     <div style={{ border: '1px solid var(--border)', borderRadius: 6, marginBottom: 8 }}>
-      <div
+      {/* Button for keyboard access — WCAG 2.1.1, 4.1.2 */}
+      <button
         onClick={() => setOpen(o => !o)}
-        style={{ cursor: 'pointer', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface)', borderRadius: open ? '6px 6px 0 0' : 6 }}
+        aria-expanded={open}
+        aria-controls={`section-content-${id}`}
+        style={{ width: '100%', cursor: 'pointer', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card-bg)', borderRadius: open ? '6px 6px 0 0' : 6, border: 'none', textAlign: 'left' }}
       >
         <span style={{ fontFamily: 'Share Tech Mono', fontSize: 12, color: 'var(--c-primary)' }}>{title}</span>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {badge && <span style={{ fontSize: 10, color: 'var(--c-warn)', fontFamily: 'Share Tech Mono' }}>{badge}</span>}
-          <span style={{ color: 'var(--muted)', fontSize: 10 }}>{open ? '▲' : '▼'}</span>
+          {badge && <span style={{ fontSize: 10, color: 'var(--c-warn)', fontFamily: 'Share Tech Mono' }} aria-label={badge}>{badge}</span>}
+          <span style={{ color: 'var(--muted)', fontSize: 10 }} aria-hidden="true">{open ? '▲' : '▼'}</span>
         </div>
-      </div>
+      </button>
       {open && (
-        <div style={{ padding: '12px 14px', fontSize: 11, lineHeight: 1.7, color: 'var(--text)', borderTop: '1px solid var(--border)' }}>
+        <div id={`section-content-${id}`} style={{ padding: '12px 14px', fontSize: 11, lineHeight: 1.7, color: 'var(--text)', borderTop: '1px solid var(--border)' }}>
           {children}
         </div>
       )}
