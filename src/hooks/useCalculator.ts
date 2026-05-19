@@ -13,7 +13,7 @@ export interface AllInputs extends CalcInputs {
   customDiam_mm: number;
 }
 
-const DEFAULT_INPUTS: AllInputs = {
+export const DEFAULT_INPUTS: AllInputs = {
   fMHz: 14.15, loopDiameterM: 1.0, shape: 'circle',
   conductorId: 'cu_tube_22',
   turns: 1, spacingRatio: 3.0, txPowerW: 100,
@@ -36,7 +36,7 @@ type Action =
   | { type: 'SET_FRIIS'; key: keyof FriisInputs; value: number | string }
   | { type: 'SET_BAND'; index: number; fMHz: number };
 
-function reducer(state: AllInputs, action: Action): AllInputs {
+export function reducer(state: AllInputs, action: Action): AllInputs {
   switch (action.type) {
     case 'SET': return { ...state, [action.key]: action.value };
     case 'SET_FRIIS': return { ...state, friis: { ...state.friis, [action.key]: action.value } };
