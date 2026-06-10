@@ -18,6 +18,7 @@ import TabConductorComp from './components/tabs/TabConductorComp';
 import TabOptimizer from './components/tabs/TabOptimizer';
 import TabCapAssist from './components/tabs/TabCapAssist';
 import TabBuild from './components/tabs/TabBuild';
+import TabComparison from './components/tabs/TabComparison';
 
 const TABS = [
   { id: 'details',    label: 'Details' },
@@ -35,6 +36,7 @@ const TABS = [
   { id: 'receive',   label: 'Ontvangst' },
   { id: 'circuit',   label: 'Circuit' },
   { id: 'steps',     label: 'Berekenstappen' },
+  { id: 'comparison', label: 'Vergelijking' },
 ];
 
 export default function App() {
@@ -122,11 +124,12 @@ export default function App() {
           {activeTab === 'ground'      && <TabGround calc={calc} />}
           {activeTab === 'linkbudget'  && <TabLinkbudget calc={calc} />}
           {activeTab === 'noise'       && <TabNoise calc={calc} />}
-          {activeTab === 'coupling'    && <TabCoupling results={calc.results} />}
+          {activeTab === 'coupling'    && <TabCoupling calc={calc} />}
           {activeTab === 'receive'     && <TabReceive results={calc.results} />}
           {activeTab === 'build'       && <TabBuild results={calc.results} />}
           {activeTab === 'circuit'     && <TabCircuit results={calc.results} />}
           {activeTab === 'steps'       && <TabSteps steps={calc.results.steps} />}
+          {activeTab === 'comparison'  && <TabComparison calc={calc} />}
         </div>
       </main>
     </>

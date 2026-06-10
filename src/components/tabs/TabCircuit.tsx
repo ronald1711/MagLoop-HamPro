@@ -1,6 +1,28 @@
 import type { CalcResult } from "../../calc/magloop";
 interface Props { results: CalcResult; }
 export default function TabCircuit({ results: r }: Props) {
+  const Vcap = r.VcapKV; // RMS voltage in kV
+  const Vpeak = Vcap * Math.sqrt(2);
+  const Vdesign = Vpeak * 1.5; // 1.5x safety margin
+
+  const airGapMm = Vdesign / 1.2; // 1.2 kV/mm breakdown strength in typical air (moisture/dust margin)
+  const vacGapMm = Vdesign / 25.0; // 25.0 kV/mm breakdown strength in vacuum
+
+  let recommendation = "";
+  let capColor = "var(--c-success)";
+  if (r.CpF_req <= 0) {
+    recommendation = "Afstemming is fysiek ONMOGELIJK! De luszelfcapaciteit (C_self) is groter dan de benodigde capaciteit. Verklein de lusdiameter of verlaag de frequentie.";
+    capColor = "var(--c-danger)";
+  } else if (Vcap < 1.0) {
+    recommendation = "Lucht-afstemcondensator (vlinder/butterfly of trombone) met minimale plaat-afstand.";
+  } else if (Vcap < 3.0) {
+    recommendation = "Hogespanning lucht-condensator of vacuüm-condensator; trombone-condensator van koperbuis.";
+    capColor = "var(--c-warn)";
+  } else {
+    recommendation = "Vacuüm variabele condensator vereist (bijv. Russian KP1-4) om overslag te voorkomen.";
+    capColor = "var(--c-danger)";
+  }
+
   return (
     <div>
       <div className="section-title">Equivalent Circuit - Balanis para 5.2.7A</div>
@@ -49,6 +71,37 @@ export default function TabCircuit({ results: r }: Props) {
           <div className="info-box" style={{marginTop:12,fontFamily:"Share Tech Mono",fontSize:11}}>
             <div style={{color:"var(--c-primary)",marginBottom:4}}>RESONANTIE FORMULE (5-36)</div>
             <div>{"Z_in = "+r.Rtotal.toFixed(4)+" + "+" + "+(r.XL*r.XL/r.Rtotal).toFixed(1)+" = "+Math.round(r.Zin_res)+" Ohm"}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="section-title" style={{marginTop:20}}>Condensator Spanningsdoorslag & Spatiëring</div>
+      <div style={{display:"grid",gridTemplateColumns:"1.2fr 1fr",gap:16}}>
+        <div className="coupling-card" style={{display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+          <h4>Doorslagspecificaties & Advies</h4>
+          <div style={{display:"flex",flexDirection:"column",gap:8,fontSize:12,color:"var(--text)"}}>
+            <div><strong>RMS Spanning:</strong> <span style={{fontFamily:"Share Tech Mono",fontSize:13}}>{Vcap.toFixed(2)} kV</span></div>
+            <div><strong>Piekspanning (V_peak):</strong> <span style={{fontFamily:"Share Tech Mono",fontSize:13}}>{Vpeak.toFixed(2)} kV</span></div>
+            <div><strong>Ontwerpspanning (1.5x marge):</strong> <span style={{fontFamily:"Share Tech Mono",fontSize:13,color:"var(--c-warn)"}}>{Vdesign.toFixed(2)} kV</span></div>
+            <div style={{marginTop:6,borderTop:"1px solid var(--border)",paddingTop:8}}>
+              <strong>Type Advies:</strong> <span style={{color:capColor,fontWeight:"bold"}}>{recommendation}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="coupling-card">
+          <h4>Minimale Plaat-afstand (Ontwerpmarge)</h4>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+            <div className="stat-card" style={{borderColor:"rgba(210,153,34,0.3)"}}>
+              <span className="stat-label">Luchtspleet (Air Gap)</span>
+              <span className="stat-val" style={{fontSize:20,color:"var(--c-warn)"}}>{r.CpF_req<=0?"N/A":airGapMm.toFixed(2)+" mm"}</span>
+              <span className="stat-label" style={{fontSize:8}}>Bij 1.2 kV/mm (lucht)</span>
+            </div>
+            <div className="stat-card" style={{borderColor:"rgba(88,166,255,0.3)"}}>
+              <span className="stat-label">Vacuümspleet (Vac Gap)</span>
+              <span className="stat-val" style={{fontSize:20,color:"var(--c-primary)"}}>{r.CpF_req<=0?"N/A":vacGapMm.toFixed(2)+" mm"}</span>
+              <span className="stat-label" style={{fontSize:8}}>Bij 25 kV/mm (vacuüm)</span>
+            </div>
           </div>
         </div>
       </div>

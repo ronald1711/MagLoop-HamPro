@@ -6,7 +6,7 @@ import { GND_REFL } from '../../calc/constants';
 
 interface Props { results: CalcResult; inputs: AllInputs; }
 
-function drawPattern(canvas: HTMLCanvasElement, regime: string) {
+function drawPattern(canvas: HTMLCanvasElement, regime: string, patternPoints: number[]) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const W = canvas.width, H = canvas.height, cx = W / 2, cy = H / 2, R = W * 0.42;
@@ -22,26 +22,44 @@ function drawPattern(canvas: HTMLCanvasElement, regime: string) {
   ctx.fillStyle = mc; ctx.font = '9px Share Tech Mono'; ctx.textAlign = 'center';
   ctx.fillText('0°', cx, cy - R - 10); ctx.fillText('180°', cx, cy + R + 18);
   ctx.fillText('90°', cx + R + 16, cy + 3); ctx.fillText('90°', cx - R - 16, cy + 3);
+
+  // Calculate dynamic HPBW line angles
+  let hpbwAngle = 45;
+  if (patternPoints) {
+    let bestDiff = 1.0;
+    for (let deg = 0; deg <= 90; deg++) {
+      const val = patternPoints[deg];
+      const diff = Math.abs(val - 0.5);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        hpbwAngle = deg;
+      }
+    }
+  }
+
   ctx.strokeStyle = 'rgba(88,166,255,0.25)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-  const hpbw_r = Math.pow(Math.sin(Math.PI / 4), 2) * R;
-  [45, 135, 225, 315].forEach(deg => {
+  [hpbwAngle, 180 - hpbwAngle, 180 + hpbwAngle, 360 - hpbwAngle].forEach(deg => {
     const a = (deg - 90) * Math.PI / 180;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + hpbw_r * Math.cos(a), cy + hpbw_r * Math.sin(a)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + R * Math.cos(a), cy + R * Math.sin(a)); ctx.stroke();
   });
   ctx.setLineDash([]);
+  
   const color = regime === 'small' ? '#3fb950' : regime === 'intermediate' ? '#d29922' : '#58a6ff';
   ctx.strokeStyle = color; ctx.lineWidth = 2.5;
   ctx.beginPath();
   for (let i = 0; i <= 360; i++) {
-    const th = (i * Math.PI) / 180, rn = Math.pow(Math.sin(th), 2);
+    const th = (i * Math.PI) / 180;
+    const rn = patternPoints ? (patternPoints[i] ?? Math.pow(Math.sin(th), 2)) : Math.pow(Math.sin(th), 2);
     const px = cx + R * rn * Math.sin(th), py = cy - R * rn * Math.cos(th);
     i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
   }
   ctx.closePath(); ctx.stroke();
+  
   ctx.fillStyle = color === '#3fb950' ? 'rgba(63,185,80,0.12)' : color === '#d29922' ? 'rgba(210,153,34,0.12)' : 'rgba(88,166,255,0.12)';
   ctx.beginPath();
   for (let i = 0; i <= 360; i++) {
-    const th = (i * Math.PI) / 180, rn = Math.pow(Math.sin(th), 2);
+    const th = (i * Math.PI) / 180;
+    const rn = patternPoints ? (patternPoints[i] ?? Math.pow(Math.sin(th), 2)) : Math.pow(Math.sin(th), 2);
     const px = cx + R * rn * Math.sin(th), py = cy - R * rn * Math.cos(th);
     i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
   }
@@ -50,7 +68,7 @@ function drawPattern(canvas: HTMLCanvasElement, regime: string) {
 
 export default function TabPattern({ results, inputs }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  useEffect(() => { if (canvasRef.current) drawPattern(canvasRef.current, results.regime); }, [results.regime]);
+  useEffect(() => { if (canvasRef.current) drawPattern(canvasRef.current, results.regime, results.patternPoints); }, [results]);
 
   // Elevation pattern above ground
   const Gamma = GND_REFL[inputs.groundType] ?? 0;
@@ -100,6 +118,26 @@ export default function TabPattern({ results, inputs }: Props) {
     },
   };
 
+  // Calculate HPBW
+  let hpbw = 90;
+  if (results.patternPoints) {
+    let bestDiff = 1.0;
+    let bestAngle = 45;
+    for (let deg = 0; deg <= 90; deg++) {
+      const val = results.patternPoints[deg];
+      const diff = Math.abs(val - 0.5);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestAngle = deg;
+      }
+    }
+    hpbw = 2 * (90 - bestAngle);
+  }
+
+  const regimeText = results.regime === 'small'
+    ? "F(θ) = sin²(θ) — Lusas = verticaal"
+    : "F(θ) = [J₁(ka sin θ) / J₁(ka)]²";
+
   return (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20 }}>
@@ -108,13 +146,13 @@ export default function TabPattern({ results, inputs }: Props) {
             <div className="section-title">Azimuth / Elevatie patroon</div>
             <canvas className="pattern-canvas" ref={canvasRef} width={240} height={240} />
             <div style={{ fontFamily: MONO, fontSize: 9, color: 'var(--muted)', marginTop: 6, textAlign: 'center' }}>
-              F(θ) = sin²(θ) — Lusas = verticaal
+              {regimeText}
             </div>
           </div>
           <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr', marginTop: 12 }}>
-            <div className="stat-card"><span className="stat-label">D₀</span><span className="stat-val" style={{ fontSize: 18 }}>1.76 dBi</span></div>
+            <div className="stat-card"><span className="stat-label">D₀</span><span className="stat-val" style={{ fontSize: 18 }}>{results.D0_dBi.toFixed(2)} dBi</span></div>
             <div className="stat-card"><span className="stat-label">Gain G</span><span className="stat-val" style={{ fontSize: 18, color: 'var(--c-success)' }}>{results.G_dBi.toFixed(2)} dBi</span></div>
-            <div className="stat-card"><span className="stat-label">HPBW</span><span className="stat-val" style={{ fontSize: 18 }}>90°</span></div>
+            <div className="stat-card"><span className="stat-label">HPBW</span><span className="stat-val" style={{ fontSize: 18 }}>{hpbw}°</span></div>
             <div className="stat-card"><span className="stat-label">A_em</span><span className="stat-val" style={{ fontSize: 16 }}>{results.Aem.toFixed(3)} m²</span></div>
           </div>
         </div>
@@ -159,7 +197,7 @@ export default function TabPattern({ results, inputs }: Props) {
         <div style={{ color: 'var(--c-primary)', marginBottom: 4 }}>PATROON EIGENSCHAPPEN — BALANIS PAR. 5.2.6</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           <div>
-            <div>Vorm: sin²(θ) — identiek aan korte dipool</div>
+            <div>Vorm: {results.regime === 'small' ? 'sin²(θ) — korte dipool' : 'Bessel J₁ — verbreed patroon'}</div>
             <div>Polarisatie: E-veld in φ-richting</div>
             <div>Null: langs lusas (θ=0°, 180°)</div>
           </div>

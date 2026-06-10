@@ -72,6 +72,18 @@ export interface CalcResult {
   regime: 'small' | 'intermediate' | 'large';
   safeDistM: number;
   steps: CalcStep[];
+  patternPoints: number[];
+}
+
+function j1(x: number): number {
+  const x2 = x * x;
+  let term = x / 2;
+  let sum = term;
+  for (let m = 1; m <= 8; m++) {
+    term *= -x2 / (4 * m * (m + 1));
+    sum += term;
+  }
+  return sum;
 }
 
 export function magloopCalc(p: CalcInputs): CalcResult {
@@ -247,6 +259,19 @@ export function magloopCalc(p: CalcInputs): CalcResult {
   const regime: 'small' | 'intermediate' | 'large' =
     Clam < 0.2 ? 'small' : Clam < 0.5 ? 'intermediate' : 'large';
 
+  const patternPoints: number[] = [];
+  const ka = (p.shape === 'circle') ? (2 * Math.PI * rLoop) / lambda : (perimeter / lambda);
+  for (let degree = 0; degree <= 360; degree++) {
+    const theta_rad = (degree * Math.PI) / 180;
+    if (Clam < 0.13) {
+      patternPoints.push(Math.pow(Math.sin(theta_rad), 2));
+    } else {
+      const peak = j1(ka);
+      const val = Math.abs(peak) > 1e-6 ? Math.pow(j1(ka * Math.sin(theta_rad)) / peak, 2) : Math.pow(Math.sin(theta_rad), 2);
+      patternPoints.push(val);
+    }
+  }
+
   return {
     L_uH: L * 1e6, area_m2: area, perimeter_m: perimeter, condLen,
     skin_um: delta * 1e6, Rs_sq, circumference_m: cond.circ_eff, plam: Clam, hLam, lambda,
@@ -255,7 +280,7 @@ export function magloopCalc(p: CalcInputs): CalcResult {
     txPowerEffective: txPower, ccable_pF, C_self_pF, CpF_req, f_min_MHz, conductorCat: cond.cat,
     D0_dBi, G_dBi, G_lin, Deff_dBi, Geff_dBi, gndBoost, AFmax,
     Aem, le_m, coupDiam, Zin_res, transN2, magMoment, safeDistM,
-    regime, steps,
+    regime, steps, patternPoints,
   };
 }
 
@@ -277,4 +302,60 @@ export function groundBoostCurve(
     labels.push(hLam.toFixed(2) + 'λ');
   }
   return { labels, data };
+}
+
+export interface VswrPoint {
+  fMHz: number;
+  vswr: number;
+}
+
+export function vswrCurve(p: CalcInputs, r: CalcResult, points = 100): VswrPoint[] {
+  const f0 = p.fMHz * 1e6;
+  const BW = r.BWkHz * 1e3;
+  const sweepRange = 5 * BW; // Sweep +/- 5 bandwidths
+  const startF = Math.max(f0 - sweepRange, 1.8e6);
+  const endF = f0 + sweepRange;
+  const step = (endF - startF) / (points - 1);
+
+  const curve: VswrPoint[] = [];
+  const C_tune = r.CpF * 1e-12;
+  const L = r.L_uH * 1e-6;
+  const R_tot0 = r.Rtotal;
+
+  for (let i = 0; i < points; i++) {
+    const f = startF + i * step;
+    const omega = 2 * Math.PI * f;
+
+    // Impedance of series R-L-C loop
+    const Z_loop_R = r.Rtotal; // assume Rtotal doesn't change drastically over few kHz
+    const Z_loop_X = omega * L - 1 / (omega * C_tune);
+
+    // Input impedance under Faraday loop match
+    const omega0 = 2 * Math.PI * f0;
+    const M2 = (50 * R_tot0) / (omega0 * omega0);
+    const num = omega * omega * M2;
+    const denom_mag2 = Z_loop_R * Z_loop_R + Z_loop_X * Z_loop_X;
+    
+    const Zin_R = (num * Z_loop_R) / denom_mag2;
+    const Zin_X = -(num * Z_loop_X) / denom_mag2;
+
+    // Reflection coefficient
+    const num_re = Zin_R - 50;
+    const num_im = Zin_X;
+    const den_re = Zin_R + 50;
+    const den_im = Zin_X;
+
+    const num_mag = Math.sqrt(num_re * num_re + num_im * num_im);
+    const den_mag = Math.sqrt(den_re * den_re + den_im * den_im);
+    const gamma = den_mag > 1e-6 ? num_mag / den_mag : 0;
+
+    let vswr = gamma < 0.999 ? (1 + gamma) / (1 - gamma) : 99.0;
+    if (vswr > 10) vswr = 10; // clamp for UI plotting
+
+    curve.push({
+      fMHz: f / 1e6,
+      vswr: parseFloat(vswr.toFixed(2))
+    });
+  }
+  return curve;
 }
