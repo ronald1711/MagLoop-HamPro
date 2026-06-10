@@ -67,9 +67,10 @@ De app is primair bedoeld voor HAM-radioamateurs die een magloop willen bouwen, 
 ### 📊 Details
 Overzicht van geometrie, inductantie, verliezen en lusstroom. Bevat:
 - Geometrie: oppervlak, omtrek, geleiderlengte, C/λ ratio
-- Band sweep: C_tune_req op lage/midden/hoge bandrand
+- Band sweep: C_tune_req op lage/midden/hoge bandrand (rekening houdend met zelfcapaciteit)
 - Efficiëntiebar over alle 9 HF-banden (160m–10m)
 - Aanbevolen minimale geleiderdiameter op basis van 20×δ
+- **4NEC2 Model Exporter**: genereert en exporteert direct een volledig gestructureerd `.nec` bestand van de antenne (cirkel/veertienhoek of vierkant) inclusief de capaciteit en broninvoeding.
 
 ### 📚 Theorie
 9 uitklapbare secties met formules, uitleg en live waarden:
@@ -122,10 +123,11 @@ Afstemcondensator assistent:
 Progressiebalk + teller open veiligheidsitems. Live waarden per item.
 
 ### 🌐 Patroon
-- Azimuth/elevatie canvas patroon: F(θ) = sin²(θ)
-- **Elevatie-grafiek boven grond**: G(θ) vs. elevatie 0–90° met Image Theory
-- NVIS vs. DX interpretatie op basis van optimale elevatie-hoek
-- Gain, HPBW, A_em, effectieve vectorlengte
+- **Bessel-gebaseerd stralingspatroon**: F(θ) = sin²(θ) voor kleine lussen ($C < 0.13\lambda$), of de genormaliseerde Bessel J1-benadering $\left(\frac{J_1(ka\sin\theta)}{J_1(ka)}\right)^2$ voor grotere lussen ($C \ge 0.13\lambda$) volgens Balanis, getekend op een interactieve canvas.
+- **Elevatie-grafiek boven grond**: G(θ) vs. elevatie 0–90° met Image Theory en Array Factor.
+- **Dynamische HPBW-meting**: automatische hoekscan op de canvas-curves om de -3dB Half-Power Beamwidth te bepalen.
+- NVIS vs. DX interpretatie op basis van optimale elevatie-hoek.
+- Gain, HPBW, A_em, effectieve vectorlengte.
 
 ### 🌍 Grondeffect
 - Grondwinst vs. hoogte h/λ grafiek (0 tot 1λ)
@@ -134,10 +136,11 @@ Progressiebalk + teller open veiligheidsitems. Live waarden per item.
 
 ### 📡 Koppeling
 Interactieve koppelingsselectie:
-- **Faraday** (aanbevolen): optimale diameter berekend, galvanische scheiding
-- **Capacitief**: koppelcondensator, 2-knops afstemming
-- **Gamma match**: tappositie berekend
-- Vergelijkingstabel: galv. scheiding, multi-band, knoppen, QRO
+- **Faraday** (aanbevolen): optimale diameter berekend, galvanische scheiding.
+- **Capacitief**: koppelcondensator, 2-knops afstemming.
+- **Gamma match**: tappositie berekend.
+- **VSWR Tuning Curve**: interactieve Chart.js plot van de VSWR over een bereik van $\pm 5$ maal de bandbreedte.
+- Vergelijkingstabel: galv. scheiding, multi-band, knoppen, QRO.
 
 ### 📻 Linkbudget
 Friis-vergelijking voor communicatiereikwijdte:
@@ -149,12 +152,21 @@ Antenneruis en signaal-ruisverhouding berekening.
 
 ### 📐 Circuit
 Equivalent circuit diagram (SVG) met:
-- R_rad, R_loop, X_L (spoel), C_tune
-- Z_in resonantie formule
-- Stat-kaarten: Z_in, X_A, R_L, R_rad, C_tune, Q
+- R_rad, R_loop, X_L (spoel), C_tune.
+- Z_in resonantie formule.
+- Stat-kaarten: Z_in, X_A, R_L, R_rad, C_tune, Q.
+- **Plaatafstand berekening**: berekent de minimaal vereiste condensatorplaatafstand in mm voor zowel lucht (air gap) als vacuüm op basis van de RMS spanning en doorslagvelden.
+- **Condensator type-advies**: adviseert over Variable Air, Trombone of Vacuum condensatoren gebaseerd op de benodigde capaciteit en spanning.
 
 ### 🧮 Berekenstappen
 Stap-voor-stap weergave van alle tussenresultaten met formules en waarden.
+
+### ⚖️ Vergelijking
+Antenna Comparison Dashboard waarin de ontworpen MagLoop direct wordt vergeleken met twee andere populaire HF-antennes:
+- **Halve-golf dipool** (resonant op $f_0$).
+- **Kwart-golf GP Verticaal** (resonant op $f_0$).
+- Vergelijkt fysieke afmetingen, efficiëntie (%) en bandbreedte (kHz).
+- Biedt een helder overzicht van compromissen tussen efficiëntie, bandbreedte en ruimtebeslag voor stedelijk gebruik.
 
 ---
 
